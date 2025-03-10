@@ -10,155 +10,161 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Create User Page</title>
+        <title>Create Account - Child Vaccination</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
         <style>
-            body {
-                font-family: 'Arial', sans-serif;
+
+            * {
                 margin: 0;
                 padding: 0;
-                color: #333;
-                background: url('images/img1.jpg') no-repeat center center fixed;
-                background-size: cover;
+                box-sizing: border-box;
+                font-family: 'Poppins', sans-serif;
             }
-            .overlay {
-                background-color: rgba(255, 255, 255, 0.8);
-                width: 100%;
-                height: 100vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 20px;
+
+            body {
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                min-height: 100vh;
             }
-            .content {
-                display: flex;
-                gap: 20px;
-                align-items: flex-start;
-                max-width: 1000px;
-                width: 100%;
-            }
+
             .container {
-                max-width: 400px;
-                width: 100%;
-                background: #fff;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 40px 20px;
             }
-            .container:hover {
-                transform: scale(1.05);
-                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-            }
-            h1 {
+
+            .hero-section {
+                background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                    url('https://img.freepik.com/free-photo/doctor-vaccinating-patient-clinic_23-2148880385.jpg');
+                background-size: cover;
+                background-position: center;
+                padding: 60px 0;
                 text-align: center;
-                color: #444;
+                color: white;
+                border-radius: 15px;
+                margin-bottom: 40px;
+            }.form-container {
+                background: white;
+                padding: 40px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .form-header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .form-header h1 {
+                color: #1e88e5;
                 font-size: 2em;
+                margin-bottom: 10px;
+            }
+
+            .form-header p {
+                color: #666;
+            }
+
+            .form-group {
                 margin-bottom: 20px;
             }
-            form {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                color: #333;
+                font-weight: 500;
             }
-            input[type="text"],
-            input[type="password"] {
+
+            .form-group input {
                 width: 100%;
-                padding: 10px;
-                font-size: 16px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                box-sizing: border-box;
+                padding: 12px;
+                border: 2px solid #e0e0e0;
+                border-radius: 10px;
+                font-size: 1em;
+                transition: all 0.3s ease;
+            }
+
+            .form-group input:focus {
+                border-color: #1e88e5;
+                box-shadow: 0 0 10px rgba(30, 136, 229, 0.1);
                 outline: none;
-                transition: border 0.3s ease;
             }
-            input[type="text"]:focus,
-            input[type="password"]:focus {
-                border-color: #007bff;
+
+            .form-group input[readonly] {
+                background-color: #f8f9fa;
+                cursor: not-allowed;
+            }.error-message {
+                color: #e74c3c;
+                font-size: 0.85em;
+                margin-top: 5px;
             }
-            input[type="submit"],
-            input[type="reset"] {
-                padding: 10px 15px;
-                font-size: 16px;
+
+            .btn-group {
+                display: flex;
+                gap: 15px;
+                margin-top: 30px;
+            }
+
+            .btn {
+                flex: 1;
+                padding: 12px;
                 border: none;
-                border-radius: 5px;
+                border-radius: 10px;
+                font-size: 1em;
                 cursor: pointer;
                 transition: all 0.3s ease;
             }
-            input[type="submit"] {
-                background-color: #28a745;
-                color: #fff;
+
+            .btn-create {
+                background: #1e88e5;
+                color: white;
             }
-            input[type="submit"]:hover {
-                background-color: #218838;
-            }
-            input[type="reset"] {
-                background-color: #dc3545;
-                color: #fff;
-            }
-            input[type="reset"]:hover {
-                background-color: #c82333;
-            }
-            .error-message {
-                color: #e74c3c;
-                font-size: 14px;
-                margin-top: -10px;
-            }
-            .logout-btn {
-                display: block;
-                text-align: center;
-                margin: 20px auto 0;
-                background-color: #007bff;
-                color: #fff;
-                padding: 10px 20px;
-                border: none;
-                border-radius: 5px;
-                text-decoration: none;
-                font-size: 16px;
-                font-weight: bold;
-                cursor: pointer;
-                transition: background-color 0.3s ease, transform 0.3s ease;
-            }
-            .logout-btn:hover {
-                background-color: #0056b3;
-                transform: scale(1.05);
-            }
-            .image-gallery {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-                flex: 1;
-            }
-            .image-gallery img {
-                width: 100%;
-                height: auto;
-                object-fit: cover;
-                border-radius: 10px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-            }
-            .image-gallery img:hover {
-                transform: scale(1.05);
-                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-            }
-            a {
-                display: inline-block;
-                text-decoration: none;
-                color: #007bff;
-                font-weight: bold;
-                padding: 10px 20px;
-                border: 2px solid #007bff;
-                border-radius: 5px;
-                background-color: #fff;
-                font-size: 16px;
-                transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
-            }
-            a:hover {
-                background-color: #007bff;
-                color: #fff;
-                transform: scale(1.1);
-                border-color: #0056b3;
+            .btn-create:hover {
+                background: #1565c0;
+                transform: translateY(-2px);
             }
 
+            .btn-reset {
+                background: #e74c3c;
+                color: white;
+            }
+
+            .btn-reset:hover {
+                background: #c0392b;
+                transform: translateY(-2px);
+            }
+
+            .back-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                color: #1e88e5;
+                text-decoration: none;
+                font-weight: 500;
+                margin-bottom: 20px;
+                transition: all 0.3s ease;
+            }
+            .back-link:hover {
+                color: #1565c0;
+                transform: translateX(-5px);
+            }
+
+            .input-icon {
+                position: relative;
+            }
+
+            .input-icon i {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #666;
+            }
+
+            .input-icon input {
+                padding-left: 40px;
+            }
         </style>
     </head>
     <body>
@@ -166,59 +172,107 @@
             <div class="content">
                 <!-- Form Container -->
                 <div class="container">
-                    <h1>Create Your Account</h1>
-                    <%
-                        UserError userError = (UserError) request.getAttribute("USER_ERROR");
-                        if (userError == null) {
-                            userError = new UserError();
-                        }
-                    %>
-                    <form action="MainController" method="POST">
-                        <div>
-                            <label for="userID">User ID</label>
-                            <input type="text" name="userID" id="userID" required />
-                            <div class="error-message"><%= userError.getUserIDError()%></div>
+                    <a href="login.jsp" class="back-link">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Home
+                    </a>
+
+                    <div class="hero-section">
+                        <h1>Join Our Vaccination Program</h1>
+                        <p>Create an account to access our services</p>
+                    </div>
+
+                    <div class="form-container">
+                        <div class="form-header">
+                            <h1>Create Your Account</h1>
+                            <p>Please fill in the information below</p>
                         </div>
-                        <div>
-                            <label for="fullName">Full Name</label>
-                            <input type="text" name="fullName" id="fullName" required />
-                            <div class="error-message"><%= userError.getFullNameError()%></div>
-                        </div>
-                        <div>
-                            <label for="roleID">Role ID</label>
-                            <input type="text" name="roleID" id="roleID" value="US" readonly />
-                        </div>
-                        <div>
-                            <label for="password">Password</label>
-                            <input type="password" name="password" id="password" required />
-                        </div>
-                        <div>
-                            <label for="confirm">Confirm Password</label>
-                            <input type="password" name="confirm" id="confirm" required />
-                            <div class="error-message"><%= userError.getConfirmError()%></div>
-                        </div>
-                        <div>
-                            <label for="email">Email</label>
-                            <input type="email" name="email" id="email" required />
-                        </div>
-                        <div>
-                            <label for="address">Address</label>
-                            <input type="text" name="address" id="address" required />
-                        </div>
-                        <div>
-                            <label for="phone">Phone</label>
-                            <input type="text" name="phone" id="phone" required />
-                        </div>
-                        <input type="submit" name="action" value="Create" />
-                        <input type="reset" value="Reset"   />
-                        <div class="error-message"><%= userError.getError()%></div>
-                    </form>
-                    <form action="MainController" method="POST">
-                        <input type="submit" name="action" value="Logout" class="logout-btn" />
-                    </form>
+
+                        <%
+                            UserError userError = (UserError) request.getAttribute("USER_ERROR");
+                            if (userError == null) {
+                                userError = new UserError();
+                            }
+                        %>
+                        <form action="MainController" method="POST">
+                            <div class="form-group">
+                                <label for="userID">User ID</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" name="userID" id="userID" required />
+                                </div>
+                                <div class="error-message"><%= userError.getUserIDError()%></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="fullName">Full Name</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-user-circle"></i>
+                                    <input type="text" name="fullName" id="fullName" required />
+                                </div>
+                                <div class="error-message"><%= userError.getFullNameError()%></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="roleID">Role</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-user-tag"></i>
+                                    <input type="text" name="roleID" id="roleID" value="US" readonly />
+                                </div>
+                            </div><div class="form-group">
+                                <label for="password">Password</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" name="password" id="password" required />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirm">Confirm Password</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" name="confirm" id="confirm" required />
+                                </div>
+                                <div class="error-message"><%= userError.getConfirmError()%></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-envelope"></i>
+                                    <input type="email" name="email" id="email" required />
+                                </div>
+                            </div> <div class="form-group">
+                                <label for="address">Address</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <input type="text" name="address" id="address" required />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-phone"></i>
+                                    <input type="text" name="phone" id="phone" required />
+                                </div>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit" name="action" value="Create" class="btn btn-create">
+                                    <i class="fas fa-user-plus"></i> Create Account
+                                </button>
+                                <button type="reset" class="btn btn-reset">
+                                    <i class="fas fa-undo"></i> Reset
+                                </button>
+                            </div>
+
+                            <div class="error-message text-center"><%= userError.getError()%></div>
+                        </form>
+                    </div>
+
                 </div>
 
-                <a href="login.jsp">Home</a>
             </div>
         </div>
     </body>
