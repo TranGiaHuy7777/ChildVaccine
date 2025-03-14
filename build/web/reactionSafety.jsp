@@ -3,64 +3,89 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Hướng dẫn xử lý sốc phản vệ</title>
+    <title>Anaphylactic Shock Management Guidelines</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Global Styles */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #fff3e0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fff3e0, #ffebee);
             color: #333;
             padding: 20px;
+            margin: 0;
         }
+        
+        /* Container */
         .container {
             max-width: 600px;
-            margin: auto;
+            margin: 40px auto;
             background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 30px;
+            border-radius: 12px;
             border: 1px solid #ffcc80;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease-out;
         }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         h1 {
             text-align: center;
             color: #d32f2f;
+            margin-bottom: 20px;
         }
+        
         p {
             line-height: 1.6;
             margin-bottom: 15px;
         }
+        
         ul {
             margin-left: 20px;
+            margin-bottom: 15px;
         }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        /* Back Button Styles */
         .back-button {
             display: inline-block;
-            padding: 10px 20px;
-            background-color: #1e88e5;
-            color: white;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #1e88e5, #1565c0);
+            color: #fff;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 50px;
             font-size: 16px;
             font-weight: 600;
             margin-top: 20px;
-            transition: background-color 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+        
         .back-button:hover {
-            background-color: #1565c0;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Hướng dẫn xử lý sốc phản vệ</h1>
-    <p><strong>Lưu ý quan trọng:</strong> Nếu trẻ có dấu hiệu sốc phản vệ (ví dụ: khó thở, sưng mặt, hắt hơi, mất ý thức), bạn cần:</p>
+    <h1>Anaphylactic Shock Management Guidelines</h1>
+    <p><strong>Important Note:</strong> If the child shows signs of anaphylactic shock (e.g., difficulty breathing, facial swelling, sneezing, loss of consciousness), you should:</p>
     <ul>
-        <li>Gọi cấp cứu ngay lập tức (số điện thoại cấp cứu: 115 hoặc số điện thoại khẩn cấp địa phương).</li>
-        <li>Đưa trẻ đến cơ sở y tế gần nhất.</li>
-        <li>Nếu có thuốc epinephrine (Adrenaline auto-injector), hãy sử dụng theo chỉ dẫn của bác sĩ.</li>
-        <li>Theo dõi sát các triệu chứng và thông báo cho nhân viên y tế ngay khi đến nơi.</li>
+        <li>Call emergency services immediately (emergency phone: 115 or your local emergency number).</li>
+        <li>Take the child to the nearest medical facility.</li>
+        <li>If an epinephrine auto-injector is available, use it as directed by a physician.</li>
+        <li>Monitor the symptoms closely and inform the medical staff immediately upon arrival.</li>
     </ul>
-    <p>Nếu đây chỉ là phản ứng nhẹ (như sốt hoặc mẩn đỏ), hãy liên hệ với bác sĩ để được tư vấn thêm.</p>
+    <p>If the reaction is mild (such as a fever or rash), please consult a doctor for further advice.</p>
     <a href="recordReaction.jsp" class="back-button">
-        <i class="fas fa-arrow-left"></i> Quay lại ghi nhận phản ứng
+        <i class="fas fa-arrow-left"></i> Back to Record Reaction
     </a>
 </div>
 </body>

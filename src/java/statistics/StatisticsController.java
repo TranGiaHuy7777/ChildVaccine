@@ -16,12 +16,11 @@ import javax.servlet.http.*;
 public class StatisticsController extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(StatisticsController.class.getName());
-    private static final int PAGE_SIZE = 10;  // Số lượng dòng trên mỗi trang (pagination)
+    private static final int PAGE_SIZE = 10;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Lấy tham số từ request (năm, quý, trang)
             String yearParam = request.getParameter("year");
             int year = (yearParam != null) ? Integer.parseInt(yearParam) : Year.now().getValue();
 
@@ -31,21 +30,19 @@ public class StatisticsController extends HttpServlet {
             String pageParam = request.getParameter("page");
             int currentPage = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
 
-            // Lấy dữ liệu thống kê từ StatisticsDAO
             StatisticsDAO statisticsDAO = new StatisticsDAO();
             Map<Integer, Integer> injectionMap = statisticsDAO.getInjectionCountByMonth(year, quarter);
             Map<Integer, Double> revenueMap = statisticsDAO.getRevenueByMonth(year, quarter);
             int totalNewUsers = statisticsDAO.getTotalNewUsers(year, quarter);
 
-            // Lấy dữ liệu chi tiết từ AppointmentDAO (có phân trang)
+            // Lấy dữ liệu chi tiết từ AppointmentDAO (nếu cần export thống kê chi tiết)
             AppointmentDAO appointmentDAO = new AppointmentDAO();
-            List<AppointmentStatisticsDTO> detailedStats = appointmentDAO.getAppointmentStatistics(year);
+            List detailedStats = appointmentDAO.getAppointmentStatistics(year);
 
             int totalRecords = detailedStats.size();
             int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
             int offset = (currentPage - 1) * PAGE_SIZE;
 
-            // Đưa dữ liệu sang JSP
             request.setAttribute("YEAR", year);
             request.setAttribute("QUARTER", quarter);
             request.setAttribute("INJECTION_MAP", injectionMap);

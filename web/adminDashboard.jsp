@@ -2,72 +2,148 @@
 <%@ page import="java.util.List, java.util.ArrayList" %>
 <%@ page import="java.sql.Connection, java.sql.PreparedStatement, java.sql.ResultSet" %>
 <%@ page import="utils.DBUtils" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard - Vaccine Management</title>
+    <!-- Font Awesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #f0f2f5; color: #333; line-height: 1.6; }
-        .navbar {
-            background: white; padding: 1rem 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;
+        /* Global Reset & Font */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; color: #333; }
+        /* Main Content */
+        .main-content {
+            margin: 20px;
+            padding: 20px 40px;
         }
+        /* Navbar */
+        .navbar {
+            background: #fff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+        .navbar .welcome-message {
+            font-size: 1.2em;
+            font-weight: 500;
+            color: #333;
+        }
+        .navbar .logout-button {
+            padding: 8px 15px;
+            background: #f44336;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .navbar .logout-button:hover {
+            background: #d32f2f;
+        }
+        /* Page Title */
+        .page-title {
+            margin: 20px 0;
+            font-size: 2em;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+        /* Reaction Table */
         .reaction-table {
-            width: 100%; border-collapse: collapse; margin: 30px 0;
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
         }
         .reaction-table th, .reaction-table td {
-            padding: 10px; border: 1px solid #ddd; text-align: center;
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
         }
-        .reaction-table th { background: #ffa726; color: white; }
+        .reaction-table th {
+            background: #ffa726;
+            color: #fff;
+        }
         .notify-button {
-            padding: 8px 12px; background: #ffa726; color: white; border: none; border-radius: 5px;
-            cursor: pointer; font-weight: 500; transition: all 0.3s ease;
+            padding: 8px 12px;
+            background: #ffa726;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
         }
-        .notify-button:hover { background: #e69500; }
+        .notify-button:hover {
+            background: #e69500;
+        }
         /* Modal Styles */
         .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5); z-index: 1000;
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
         }
         .modal-container {
-            position: fixed; top: 50%; left: 50%;
+            position: fixed;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
-            background: white; padding: 20px; border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            width: 90%; max-width: 400px; text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
         }
-        .modal-title { font-size: 1.5em; margin-bottom: 15px; }
-        .modal-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+        .modal-container .modal-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
         .modal-button {
-            padding: 10px 20px; border: none; border-radius: 5px;
-            cursor: pointer; font-weight: 500;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
         }
-        .confirm-button { background: #3498db; color: white; }
+        .confirm-button { background: #3498db; color: #fff; }
         .cancel-button { background: #e0e0e0; color: #333; }
     </style>
 </head>
 <body>
-
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="welcome-message">
-            <i class="fas fa-user-shield"></i> Welcome, Admin
-        </div>
-        <form action="MainController" method="POST">
-            <button type="submit" name="action" value="Logout" class="logout-button">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-        </form>
-    </nav>
-
     <!-- Main Content -->
-    <div class="main-container">
-        <h2>Reaction Notifications (Today)</h2>
+    <div class="main-content">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="welcome-message">
+                <i class="fas fa-user-shield"></i> Welcome, Admin
+            </div>
+            <form action="MainController" method="POST">
+                <button type="submit" name="action" value="Logout" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </nav>
+        <!-- Page Title -->
+        <h1 class="page-title">Reaction Notifications (Today)</h1>
+        <!-- Reaction Table -->
         <%
             List<String[]> reactionList = new ArrayList<>();
             try {
@@ -95,7 +171,6 @@
                 out.println("<p>Error: " + ex.getMessage() + "</p>");
             }
         %>
-
         <%
             if (reactionList.isEmpty()) {
         %>
@@ -137,7 +212,6 @@
             }
         %>
     </div>
-
     <!-- Modal for Sending Notification -->
     <div id="notifyModal" class="modal-overlay">
         <div class="modal-container">
@@ -145,8 +219,7 @@
             <h2 class="modal-title">Send Notification</h2>
             <form id="notifyForm" action="SendNotificationController" method="post">
                 <input type="hidden" name="userID" id="notifyUserID" value=""/>
-                <textarea name="notificationText" id="notificationText" placeholder="Enter notification message"
-                          style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" required></textarea>
+                <textarea name="notificationText" id="notificationText" placeholder="Enter notification message" style="width:100%; height:100px; padding:10px; border:1px solid #ccc; border-radius:5px;" required></textarea>
                 <div class="modal-buttons">
                     <button type="submit" class="modal-button confirm-button">Send</button>
                     <button type="button" class="modal-button cancel-button" onclick="closeNotifyModal()">Cancel</button>
@@ -154,8 +227,17 @@
             </form>
         </div>
     </div>
-
-    <!-- JavaScript for Modal Handling -->
+    <!-- Modal for Success Notification -->
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-container">
+            <span class="modal-close" onclick="closeSuccessModal()">&times;</span>
+            <h2 class="modal-title">Success</h2>
+            <p>Notification sent successfully!</p>
+            <div class="modal-buttons">
+                <button class="modal-button confirm-button" onclick="closeSuccessModal()">OK</button>
+            </div>
+        </div>
+    </div>
     <script>
         function openNotifyModal(userID) {
             document.getElementById("notifyUserID").value = userID;
@@ -164,7 +246,31 @@
         function closeNotifyModal() {
             document.getElementById("notifyModal").style.display = "none";
         }
+        function openSuccessModal() {
+            document.getElementById("successModal").style.display = "block";
+        }
+        function closeSuccessModal() {
+            document.getElementById("successModal").style.display = "none";
+        }
+        window.onclick = function(event) {
+            if (event.target == document.getElementById("notifyModal")) {
+                closeNotifyModal();
+            }
+            if (event.target == document.getElementById("successModal")) {
+                closeSuccessModal();
+            }
+        }
     </script>
-
+    <%
+        if("true".equals(request.getParameter("notifySuccess"))) {
+    %>
+    <script>
+        window.onload = function(){
+            openSuccessModal();
+        }
+    </script>
+    <%
+        }
+    %>
 </body>
 </html>

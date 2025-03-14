@@ -26,14 +26,17 @@ public class AppointmentController extends HttpServlet {
         String centerID = request.getParameter("centerID");
         String appointmentDate = request.getParameter("appointmentDate");
         String serviceType = request.getParameter("serviceType");
+        String vaccineID = request.getParameter("vaccineID"); // Thêm trường vaccineID
 
         // In dữ liệu để debug
         System.out.println("Received Data - childID: " + childID + ", centerID: " + centerID
-                + ", appointmentDate: " + appointmentDate + ", serviceType: " + serviceType);
+                + ", appointmentDate: " + appointmentDate + ", serviceType: " + serviceType
+                + ", vaccineID: " + vaccineID);
 
         // Kiểm tra dữ liệu hợp lệ
         if (childID == null || childID.isEmpty() || centerID == null || centerID.isEmpty()
-                || appointmentDate == null || appointmentDate.isEmpty() || serviceType == null || serviceType.isEmpty()) {
+                || appointmentDate == null || appointmentDate.isEmpty() || serviceType == null || serviceType.isEmpty()
+                || vaccineID == null || vaccineID.isEmpty()) {
             request.setAttribute("errorMessage", "All fields are required.");
             request.getRequestDispatcher("appointmentForm.jsp").forward(request, response);
             return;
@@ -42,11 +45,20 @@ public class AppointmentController extends HttpServlet {
         try {
             int childIdInt = Integer.parseInt(childID);
             int centerIdInt = Integer.parseInt(centerID);
+            int vaccineIdInt = Integer.parseInt(vaccineID);
             Date appointmentDateSQL = Date.valueOf(appointmentDate); // Convert to SQL Date
 
-            // Tạo đối tượng DTO để lưu vào database
-            AppointmentDTO appointment = new AppointmentDTO(0, childIdInt, centerIdInt, appointmentDateSQL, serviceType, "Not pending", "Pending");
-
+            // Tạo đối tượng DTO để lưu vào database, bao gồm cả vaccineID
+            AppointmentDTO appointment = new AppointmentDTO(
+                    0, 
+                    childIdInt, 
+                    centerIdInt, 
+                    appointmentDateSQL, 
+                    serviceType, 
+                    "Not pending", 
+                    "Pending", 
+                    vaccineIdInt
+            );
 
             // Gọi DAO để lưu vào database
             AppointmentDAO dao = new AppointmentDAO();
@@ -61,6 +73,7 @@ public class AppointmentController extends HttpServlet {
                 session.setAttribute("centerID", centerID);
                 session.setAttribute("appointmentDate", appointmentDate);
                 session.setAttribute("serviceType", serviceType);
+                session.setAttribute("vaccineID", vaccineID);
 
                 // Chuyển hướng sang trang thanh toán
                 request.getRequestDispatcher("payment.jsp").forward(request, response);

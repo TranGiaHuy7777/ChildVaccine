@@ -11,33 +11,39 @@ public class AppointmentDTO {
     private String serviceType;
     private String notificationStatus;
     private String status;
-    
+    private int vaccineID;  // Trường vaccineID mới
+
     // Thông tin trẻ
     private String childName;
     private Date dateOfBirth;
     private String gender;
     
-    // Thêm các trường cho thống kê chi tiết
+    // Các trường cho thống kê chi tiết
     private int injectionCount;
     private double revenue;
 
     public AppointmentDTO() {
     }
 
-    public AppointmentDTO(int appointmentID, int childID, int centerID, Date appointmentDate, String serviceType, String notificationStatus, String status) {
-        this.appointmentID = appointmentID;
-        this.childID = childID;
-        this.centerID = centerID;
-        this.appointmentDate = appointmentDate;
-        this.serviceType = serviceType;
-        this.notificationStatus = notificationStatus;
-        this.status = status;
-    }
+    // Constructor cập nhật có thêm vaccineID
+   public AppointmentDTO(int appointmentID, int childID, int centerID, Date appointmentDate,
+                      String serviceType, String notificationStatus, String status, int vaccineID) {
+    this.appointmentID = appointmentID;
+    this.childID = childID;
+    this.centerID = centerID;
+    this.appointmentDate = appointmentDate;
+    this.serviceType = serviceType;
+    this.notificationStatus = notificationStatus;
+    this.status = status;
+    this.vaccineID = vaccineID;
+}
+
     
+    // Constructor có thêm thông tin trẻ và vaccineID
     public AppointmentDTO(int appointmentID, int childID, int centerID, Date appointmentDate,
-                      String serviceType, String notificationStatus, String status,
-                      String childName, Date dateOfBirth, String gender) {
-        this(appointmentID, childID, centerID, appointmentDate, serviceType, notificationStatus, status);
+                          String serviceType, String notificationStatus, String status,
+                          String childName, Date dateOfBirth, String gender, int vaccineID) {
+        this(appointmentID, childID, centerID, appointmentDate, serviceType, notificationStatus, status, vaccineID);
         this.childName = childName;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
@@ -100,36 +106,53 @@ public class AppointmentDTO {
         this.status = status;
     }
 
+    // Getter và Setter cho vaccineID
+    public int getVaccineID() {
+        return vaccineID;
+    }
+
+    public void setVaccineID(int vaccineID) {
+        this.vaccineID = vaccineID;
+    }
+
     // Getters và Setters cho thông tin trẻ
     public String getChildName() {
         return childName;
     }
+    
     public void setChildName(String childName) {
         this.childName = childName;
     }
+    
     public Date getDateOfBirth() {
         return dateOfBirth;
     }
+    
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
+    
     public String getGender() {
         return gender;
     }
+    
     public void setGender(String gender) {
         this.gender = gender;
     }
     
-    // --- Các phương thức mới cho thống kê chi tiết ---
+    // Các phương thức cho thống kê chi tiết
     public int getInjectionCount() {
         return injectionCount;
     }
+    
     public void setInjectionCount(int injectionCount) {
         this.injectionCount = injectionCount;
     }
+    
     public double getRevenue() {
         return revenue;
     }
+    
     public void setRevenue(double revenue) {
         this.revenue = revenue;
     }

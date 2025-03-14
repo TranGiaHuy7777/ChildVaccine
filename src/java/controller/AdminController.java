@@ -35,28 +35,29 @@ public class AdminController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         // Trong phương thức processRequest của AdminController
-        String action = request.getParameter("action");
+String action = request.getParameter("action");
 
-        if ("updatePrice".equals(action)) {
-
-            try {
-                int vaccineId = Integer.parseInt(request.getParameter("vaccineId"));
-                BigDecimal newPrice = new BigDecimal(request.getParameter("newPrice"));
-
-                VaccineDAO dao = new VaccineDAO();
-                boolean success = dao.updateVaccinePrice(vaccineId, newPrice);
-
-                if (success) {
-                    request.setAttribute("message", "Cập nhật giá thành công!");
-                } else {
-                    request.setAttribute("error", "Không thể cập nhật giá. Vui lòng thử lại!");
-                }
-
-            } catch (Exception e) {
-                request.setAttribute("error", "Lỗi: " + e.getMessage());
-            }
-            request.getRequestDispatcher("admin.jsp").forward(request, response);
+if ("updatePrice".equals(action)) {
+    
+    
+    try {
+        int vaccineId = Integer.parseInt(request.getParameter("vaccineId"));
+        BigDecimal newPrice = new BigDecimal(request.getParameter("newPrice"));
+        
+        VaccineDAO dao = new VaccineDAO();
+        boolean success = dao.updateVaccinePrice(vaccineId, newPrice);
+        
+        if (success) {
+            request.setAttribute("message", "Cập nhật giá thành công!");
+        } else {
+            request.setAttribute("error", "Không thể cập nhật giá. Vui lòng thử lại!");
         }
+        
+    } catch (Exception e) {
+        request.setAttribute("error", "Lỗi: " + e.getMessage());
+    }
+    request.getRequestDispatcher("admin.jsp").forward(request, response);
+}
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

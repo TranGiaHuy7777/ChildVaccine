@@ -1,88 +1,125 @@
-<%@page contentType="text/html;charset=UTF-8" language="java" %>
-<%@page import="java.sql.*" %>
-<%@page import="java.util.*" %>
-<%@page import="java.text.DateFormatSymbols" %>
-<%@page import="java.text.SimpleDateFormat" %>
-<%@page import="utils.DBUtils" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="java.util.*" %>
+<%@ page import="java.text.DateFormatSymbols" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="utils.DBUtils" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Hồ Sơ Tiêm Chủng</title>
+    <title>Vaccination Record - Full Year Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Global Styles */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #eef2f3, #8e9eab);
             color: #333;
             margin: 0;
             padding: 0;
         }
         .container {
-            max-width: 1000px;
-            margin: 30px auto;
-            padding: 20px;
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            animation: fadeIn 1s ease;
         }
-        h1 {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1, h2 {
             text-align: center;
             margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
-        h2 {
-            margin-top: 40px;
-            color: #1e88e5;
-            text-align: center;
+        h1 { font-size: 2.5em; }
+        h2 { font-size: 1.8em; color: #1e88e5; }
+        
+        /* Back Button */
+        .back-button {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(90deg, #4a90e2, #357ab7);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        
+        /* Calendar Table */
         table.calendar {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
         }
-        table.calendar th,
-        table.calendar td {
-            width: 14.28%;
-            height: 100px;
-            border: 1px solid #ccc;
-            vertical-align: top;
-            text-align: center;
-            position: relative;
-            background-color: #fafafa;
+        table.calendar th, table.calendar td {
+            padding: 10px;
+            border: 1px solid #ddd;
         }
         table.calendar th {
-            background-color: #1e88e5;
-            color: white;
+            background: #4a90e2;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+        table.calendar td {
+            height: 100px;
+            vertical-align: top;
+            background: #fff;
+            position: relative;
+            transition: background 0.3s;
+        }
+        table.calendar td:hover {
+            background: #f9f9f9;
         }
         .day-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            padding: 5px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
+            height: 100%;
+            padding: 5px;
         }
         .day-number {
-            font-weight: bold;
             font-size: 16px;
-            color: #333;
+            font-weight: bold;
             margin-bottom: 5px;
+            color: #4a4a4a;
         }
         .marker {
             display: inline-block;
             margin: 2px 0;
             padding: 4px 8px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             border-radius: 12px;
-        }
-        .marker-x {
-            background-color: #f44336;
-            color: #fff;
-        }
-        .marker-remind {
-            background-color: #ffa726;
-            color: #fff;
+            transition: transform 0.3s, opacity 0.3s;
             cursor: pointer;
         }
+        .marker:hover {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
+        .marker-x { background: #e74c3c; color: #fff; }
+        .marker-remind { background: #f39c12; color: #fff; }
+        
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -91,112 +128,133 @@
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.5);
+            animation: fadeInModal 0.5s ease forwards;
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         .modal-content {
-            background-color: #fff;
+            background: #fff;
             margin: 10% auto;
             padding: 20px;
-            border: 1px solid #888;
             width: 400px;
-            border-radius: 8px;
+            border-radius: 10px;
             position: relative;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            animation: slideIn 0.5s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         .modal-close {
             position: absolute;
-            right: 15px;
             top: 10px;
-            font-size: 20px;
-            font-weight: bold;
-            color: #aaa;
+            right: 15px;
+            font-size: 22px;
+            color: #888;
             cursor: pointer;
+            transition: color 0.3s;
         }
-        .modal-close:hover {
-            color: #333;
-        }
-        .modal-body {
-            margin-top: 20px;
-        }
-        .detail-item {
-            margin-bottom: 10px;
-        }
-        .detail-item span {
-            font-weight: bold;
-        }
-        .back-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #1e88e5;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
+        .modal-close:hover { color: #444; }
+        .modal-body { margin-top: 20px; font-size: 14px; }
+        .detail-item { margin-bottom: 10px; }
+        .detail-item span { font-weight: bold; color: #333; }
+        
+        /* Alert Styles */
+        .alert {
+            padding: 15px;
+            margin: 20px auto;
+            border-radius: 4px;
+            text-align: center;
+            width: 80%;
             font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            transition: background-color 0.3s ease;
         }
-        .back-button:hover {
-            background-color: #1565c0;
+        .alert-danger {
+            color: #721c24;
+            background: #f8d7da;
+        }
+        .alert-success {
+            color: #155724;
+            background: #d4edda;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            table.calendar th, table.calendar td {
+                font-size: 12px;
+                padding: 8px;
+            }
+            .back-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Hồ Sơ Tiêm Chủng - Lịch Cả Năm (No AppointmentDetails)</h1>
+    <h1>Vaccination Record - Full Year Calendar</h1>
     <a href="vaccinationSchedule.jsp" class="back-button">
         <i class="fas fa-arrow-left"></i> Back to Schedule
     </a>
 
     <%
-        // 1) Lấy childID từ URL
+        // 1) Get childID from URL
         String childIDParam = request.getParameter("childID");
         if (childIDParam == null || childIDParam.trim().isEmpty()) {
-            out.println("<p style='text-align:center;color:red;'>Không tìm thấy thông tin trẻ em (thiếu childID).</p>");
+            out.println("<p style='text-align:center;color:red;'>Child information not found (missing childID).</p>");
             return;
         }
         int childID = Integer.parseInt(childIDParam);
         out.println("<!-- DEBUG: childID = " + childID + " -->");
 
-        // 2) Lấy năm hiện tại
+        // 2) Get current year
         Calendar now = Calendar.getInstance();
         int currentYear = now.get(Calendar.YEAR);
         out.println("<!-- DEBUG: currentYear = " + currentYear + " -->");
 
-        // 3) Chuẩn bị định dạng ngày
+        // 3) Prepare date format
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        // 4) Tạo lớp AppointmentDetail với thêm trường appointmentID
+        // 4) Define AppointmentDetail class with additional fields: appointmentID and vaccineName
         class AppointmentDetail {
             int appointmentID;
-            String marker;         // "X" hoặc "tiêm chủng"
+            String marker;         // "X" or "Vaccinated"
             String serviceType;
             String centerName;
             java.sql.Date appointmentDate;
+            String vaccineName;
         }
 
-        // 5) Cấu trúc: yearAppointments[tháng][ngày] = List<AppointmentDetail>
+        // 5) Structure: yearAppointments[month][day] = List<AppointmentDetail>
         Map<Integer, Map<Integer, List<AppointmentDetail>>> yearAppointments = new HashMap<>();
         for (int m = 1; m <= 12; m++) {
             yearAppointments.put(m, new HashMap<Integer, List<AppointmentDetail>>());
         }
 
-        // 6) Truy vấn DB: lấy thông tin lịch hẹn của trẻ (bao gồm appointmentID)
+        // 6) Query DB: get child's appointment info (including appointmentID and vaccineName)
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             conn = DBUtils.getConnection();
-            String sql = "SELECT a.appointmentID, a.appointmentDate, a.serviceType, c.centerName " +
+            String sql = "SELECT a.appointmentID, a.appointmentDate, a.serviceType, c.centerName, v.vaccineName " +
                          "FROM tblAppointments a " +
                          "JOIN tblCenters c ON a.centerID = c.centerID " +
+                         "JOIN tblVaccines v ON a.vaccineID = v.vaccineID " +
                          "WHERE YEAR(a.appointmentDate)=? AND a.childID=?";
             ps = conn.prepareStatement(sql);
             ps.setInt(1, currentYear);
             ps.setInt(2, childID);
             rs = ps.executeQuery();
 
-            // Tính ngày hôm nay (0h0p)
+            // Calculate today's date (00:00)
             Calendar todayCal = Calendar.getInstance();
             todayCal.set(Calendar.HOUR_OF_DAY, 0);
             todayCal.set(Calendar.MINUTE, 0);
@@ -211,11 +269,13 @@
                 java.sql.Date appDate = rs.getDate("appointmentDate");
                 String serviceType = rs.getString("serviceType");
                 String centerName = rs.getString("centerName");
+                String vaccineName = rs.getString("vaccineName");
                 countAppointments++;
                 out.println("<!-- DEBUG: Found appointment => appointmentID=" + appointmentID 
                             + ", date=" + appDate
                             + ", serviceType=" + serviceType
-                            + ", center=" + centerName + " -->");
+                            + ", center=" + centerName
+                            + ", vaccineName=" + vaccineName + " -->");
 
                 Calendar appCal = Calendar.getInstance();
                 appCal.setTime(appDate);
@@ -227,10 +287,11 @@
                 detail.serviceType = serviceType;
                 detail.centerName = centerName;
                 detail.appointmentDate = appDate;
+                detail.vaccineName = vaccineName;
                 if (appDate.before(todayDate)) {
                     detail.marker = "X";
                 } else {
-                    detail.marker = "tiêm chủng";
+                    detail.marker = "Vaccinated";
                 }
 
                 Map<Integer, List<AppointmentDetail>> monthMap = yearAppointments.get(month);
@@ -249,7 +310,7 @@
             if (conn != null) { try { conn.close(); } catch (Exception e) {} }
         }
 
-        // 7) Hiển thị lịch cho 12 tháng
+        // 7) Display calendar for all 12 months
         for (int m = 1; m <= 12; m++) {
             Calendar monthCal = Calendar.getInstance();
             monthCal.set(Calendar.YEAR, currentYear);
@@ -264,13 +325,13 @@
     <h2><%= new DateFormatSymbols().getMonths()[m - 1] %> <%= currentYear %></h2>
     <table class="calendar">
         <tr>
-            <th>Chủ Nhật</th>
-            <th>Thứ Hai</th>
-            <th>Thứ Ba</th>
-            <th>Thứ Tư</th>
-            <th>Thứ Năm</th>
-            <th>Thứ Sáu</th>
-            <th>Thứ Bảy</th>
+            <th>Sunday</th>
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+            <th>Saturday</th>
         </tr>
         <tr>
             <%
@@ -295,8 +356,9 @@
                                       "' onclick=\"showDetailModal(" + detail.appointmentID + ",'" +
                                       detail.serviceType + "','" +
                                       detail.centerName + "','" +
-                                      appDateStr + "')\">" +
-                                      (("X".equals(detail.marker)) ? "X" : "Tiêm Chủng") +
+                                      appDateStr + "','" +
+                                      detail.vaccineName + "')\">" +
+                                      (("X".equals(detail.marker)) ? "X" : "Vaccinated") +
                                       "</span>");
                         }
                     }
@@ -316,48 +378,46 @@
     %>
 </div>
 
-<!-- Modal hiển thị chi tiết -->
+<!-- Detail Modal -->
 <div id="detailModal" class="modal">
     <div class="modal-content">
         <span class="modal-close" onclick="closeDetailModal()">&times;</span>
-        <h3>Thông Tin Tiêm Chủng</h3>
+        <h3>Vaccination Details</h3>
         <div class="modal-body" id="modalBody">
-            <!-- Nội dung chi tiết sẽ được cập nhật qua JavaScript -->
+            <!-- Detail content will be updated via JavaScript -->
         </div>
     </div>
 </div>
 
 <script>
-            var globalAppointmentID = 0;
-            function showDetailModal(appointmentID, serviceType, centerName, appDate) {
-                globalAppointmentID = appointmentID;
-                const modalBody = document.getElementById('modalBody');
-                modalBody.innerHTML =
-                        "<div class='detail-item'><span>Dịch vụ:</span> " + serviceType + "</div>" +
-                        "<div class='detail-item'><span>Cơ sở:</span> " + centerName + "</div>" +
-                        "<div class='detail-item'><span>Thời gian:</span> " + appDate + "</div>" +
-                        "<div class='detail-item'><span>Lưu ý:</span> " + "Trung tâm chúng tôi sẽ nhắc nhở bạn qua SMS/ Email. Hãy kiểm tra lại " + "</div>" +
-                        "<button class='delete-button' style='margin-top:10px; padding:8px 12px; background-color:#f44336; color:#fff; border:none; border-radius:5px; cursor:pointer;' onclick='deleteAppointment()'>Delete Appointment</button>";
-                document.getElementById('detailModal').style.display = 'block';
-            }
-
-            function deleteAppointment() {
-                if (confirm("Are you sure you want to delete this appointment?")) {
-                    window.location.href = 'DeleteAppointmentController?appointmentID=' + globalAppointmentID;
-                }
-            }
-
-            function closeDetailModal() {
-                document.getElementById('detailModal').style.display = 'none';
-            }
-
-            window.onclick = function (event) {
-                const detailModal = document.getElementById('detailModal');
-                if (event.target === detailModal) {
-                    detailModal.style.display = 'none';
-                }
-            }
-        </script>
+    var globalAppointmentID = 0;
+    function showDetailModal(appointmentID, serviceType, centerName, appDate, vaccineName) {
+        globalAppointmentID = appointmentID;
+        const modalBody = document.getElementById('modalBody');
+        modalBody.innerHTML =
+            "<div class='detail-item'><span>Service:</span> " + serviceType + "</div>" +
+            "<div class='detail-item'><span>Center:</span> " + centerName + "</div>" +
+            "<div class='detail-item'><span>Date:</span> " + appDate + "</div>" +
+            "<div class='detail-item'><span>Vaccine Name:</span> " + vaccineName + "</div>" +
+            "<div class='detail-item'><span>Note:</span> The center will remind you via SMS/Email. Please check your messages.</div>" +
+            "<button class='delete-button' style='margin-top:10px; padding:8px 12px; background-color:#f44336; color:#fff; border:none; border-radius:5px; cursor:pointer;' onclick='deleteAppointment()'>Delete Appointment</button>";
+        document.getElementById('detailModal').style.display = 'block';
+    }
+    function deleteAppointment() {
+        if (confirm("Are you sure you want to delete this appointment?")) {
+            window.location.href = 'DeleteAppointmentController?appointmentID=' + globalAppointmentID;
+        }
+    }
+    function closeDetailModal() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+    window.onclick = function (event) {
+        const detailModal = document.getElementById('detailModal');
+        if (event.target === detailModal) {
+            detailModal.style.display = 'none';
+        }
+    }
+</script>
 
 </body>
 </html>
