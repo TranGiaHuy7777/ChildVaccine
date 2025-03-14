@@ -1,13 +1,15 @@
--- Tạo database ChildVaccine nếu chưa tồn tại
-IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'ChildVaccine')
-    CREATE DATABASE ChildVaccine;
+USE master;
 GO
 
-USE ChildVaccine;
+-- Tạo database ChildVaccine2 nếu chưa tồn tại
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'ChildVaccine2')
+    CREATE DATABASE ChildVaccine2;
+GO
+
+USE ChildVaccine2;
 GO
 
 -- Xóa các bảng nếu đã tồn tại (theo thứ tự phụ thuộc)
-DROP TABLE IF EXISTS tblRecords;
 DROP TABLE IF EXISTS tblServiceAppointments;
 DROP TABLE IF EXISTS tblPackageDetails;
 DROP TABLE IF EXISTS tblServices;
@@ -15,16 +17,13 @@ DROP TABLE IF EXISTS tblNotifications;
 DROP TABLE IF EXISTS tblPackages;
 DROP TABLE IF EXISTS tblReports;
 DROP TABLE IF EXISTS tblFeedback;
-DROP TABLE IF EXISTS tblAppointmentDetails;
 DROP TABLE IF EXISTS tblAppointments;
-DROP TABLE IF EXISTS tblAppointmentSessions;
-DROP TABLE IF EXISTS tblVaccines;
-DROP TABLE IF EXISTS tblChildren;
-DROP TABLE IF EXISTS tblCenters;
-DROP TABLE IF EXISTS tblCustomers;
-GO
+DROP TABLE IF EXISTS tblChildVaccineNotes;
 
--- Tạo bảng tblCustomers
+
+--------------------------------------------------------------------------------
+-- 1) Tạo bảng tblCustomers
+--------------------------------------------------------------------------------
 CREATE TABLE tblCustomers (
     userID NVARCHAR(20) PRIMARY KEY,
     password NVARCHAR(50) NOT NULL,
@@ -37,7 +36,9 @@ CREATE TABLE tblCustomers (
 );
 GO
 
--- Tạo bảng tblCenters
+--------------------------------------------------------------------------------
+-- 2) Tạo bảng tblCenters
+--------------------------------------------------------------------------------
 CREATE TABLE tblCenters (
     centerID INT PRIMARY KEY IDENTITY(1,1),
     centerName NVARCHAR(100) NOT NULL,
@@ -49,7 +50,9 @@ CREATE TABLE tblCenters (
 );
 GO
 
--- Tạo bảng tblChildren
+--------------------------------------------------------------------------------
+-- 3) Tạo bảng tblChildren
+--------------------------------------------------------------------------------
 CREATE TABLE tblChildren (
     childID INT PRIMARY KEY IDENTITY(1,1),
     userID NVARCHAR(20) NOT NULL,
@@ -60,7 +63,9 @@ CREATE TABLE tblChildren (
 );
 GO
 
--- Tạo bảng tblVaccines
+--------------------------------------------------------------------------------
+-- 4) Tạo bảng tblVaccines
+--------------------------------------------------------------------------------
 CREATE TABLE tblVaccines (
     vaccineID INT PRIMARY KEY IDENTITY(1,1),
     vaccineName NVARCHAR(100) NOT NULL,
@@ -71,7 +76,9 @@ CREATE TABLE tblVaccines (
 );
 GO
 
--- Tạo bảng tblAppointments
+--------------------------------------------------------------------------------
+-- 5) Tạo bảng tblAppointments
+--------------------------------------------------------------------------------
 CREATE TABLE tblAppointments (
     appointmentID INT PRIMARY KEY IDENTITY(1,1),
     childID INT NOT NULL,
@@ -85,32 +92,9 @@ CREATE TABLE tblAppointments (
 );
 GO
 
--- Tạo bảng tblAppointmentDetails
-CREATE TABLE tblAppointmentDetails (
-    appointmentDetailID INT PRIMARY KEY IDENTITY(1,1),
-    appointmentID INT NOT NULL,
-    vaccineID INT NOT NULL,
-    doseNumber INT NOT NULL,
-    FOREIGN KEY (appointmentID) REFERENCES tblAppointments(appointmentID),
-    FOREIGN KEY (vaccineID) REFERENCES tblVaccines(vaccineID)
-);
-GO
-
--- Tạo bảng tblAppointmentSessions (đã thêm cột vaccineID)
-CREATE TABLE tblAppointmentSessions (
-    childID INT NOT NULL,
-    centerID INT NOT NULL,
-    appointmentDate DATE NOT NULL,
-    serviceType NVARCHAR(50) NOT NULL,
-    vaccineID INT NOT NULL,
-    sessionDate DATETIME NOT NULL DEFAULT GETDATE(),
-	FOREIGN KEY (childID) REFERENCES tblChildren(childID),
-    FOREIGN KEY (centerID) REFERENCES tblCenters(centerID),
-    FOREIGN KEY (vaccineID) REFERENCES tblVaccines(vaccineID)
-);
-GO
-
--- Tạo bảng tblFeedback
+--------------------------------------------------------------------------------
+-- 7) Tạo bảng tblFeedback
+--------------------------------------------------------------------------------
 CREATE TABLE tblFeedback (
     feedbackID INT PRIMARY KEY IDENTITY(1,1),
     userID NVARCHAR(20) NOT NULL,
@@ -123,7 +107,9 @@ CREATE TABLE tblFeedback (
 );
 GO
 
--- Tạo bảng tblReports
+--------------------------------------------------------------------------------
+-- 8) Tạo bảng tblReports
+--------------------------------------------------------------------------------
 CREATE TABLE tblReports (
     reportID INT PRIMARY KEY IDENTITY(1,1),
     centerID INT NOT NULL,
@@ -134,7 +120,9 @@ CREATE TABLE tblReports (
 );
 GO
 
--- Tạo bảng tblPackages
+--------------------------------------------------------------------------------
+-- 9) Tạo bảng tblPackages
+--------------------------------------------------------------------------------
 CREATE TABLE tblPackages (
     packageID INT PRIMARY KEY IDENTITY(1,1),
     packageName NVARCHAR(100) NOT NULL,
@@ -144,7 +132,9 @@ CREATE TABLE tblPackages (
 );
 GO
 
--- Tạo bảng tblNotifications
+--------------------------------------------------------------------------------
+-- 10) Tạo bảng tblNotifications
+--------------------------------------------------------------------------------
 CREATE TABLE tblNotifications (
     notificationID INT PRIMARY KEY IDENTITY(1,1),
     userID NVARCHAR(20) NOT NULL,
@@ -155,7 +145,9 @@ CREATE TABLE tblNotifications (
 );
 GO
 
--- Tạo bảng tblServices
+--------------------------------------------------------------------------------
+-- 11) Tạo bảng tblServices
+--------------------------------------------------------------------------------
 CREATE TABLE tblServices (
     serviceID INT PRIMARY KEY IDENTITY(1,1),
     serviceName NVARCHAR(100) NOT NULL,
@@ -165,7 +157,9 @@ CREATE TABLE tblServices (
 );
 GO
 
--- Tạo bảng tblPackageDetails
+--------------------------------------------------------------------------------
+-- 12) Tạo bảng tblPackageDetails
+--------------------------------------------------------------------------------
 CREATE TABLE tblPackageDetails (
     packageDetailID INT PRIMARY KEY IDENTITY(1,1),
     packageID INT NOT NULL,
@@ -175,7 +169,9 @@ CREATE TABLE tblPackageDetails (
 );
 GO
 
--- Tạo bảng tblServiceAppointments
+--------------------------------------------------------------------------------
+-- 13) Tạo bảng tblServiceAppointments
+--------------------------------------------------------------------------------
 CREATE TABLE tblServiceAppointments (
     serviceAppointmentID INT PRIMARY KEY IDENTITY(1,1),
     appointmentID INT NOT NULL,
@@ -185,36 +181,9 @@ CREATE TABLE tblServiceAppointments (
 );
 GO
 
-CREATE TABLE tblVaccineReactions (
-    reactionID INT PRIMARY KEY IDENTITY(1,1),
-    appointmentID INT NOT NULL,
-    reactionText NVARCHAR(MAX) NULL,
-    reactionDate DATE NOT NULL DEFAULT GETDATE(),
-    FOREIGN KEY (appointmentID) REFERENCES tblAppointments(appointmentID) ON DELETE CASCADE
-);
-GO
-
--- Tạo bảng tblRecords
-CREATE TABLE tblRecords (
-    recordID INT PRIMARY KEY IDENTITY(1,1),
-    childID INT NOT NULL,
-    vaccineID INT NOT NULL,
-    doseNumber INT NOT NULL,
-    vaccinationDate DATE NOT NULL,
-    centerID INT NOT NULL,
-    appointmentID INT,
-    notes NVARCHAR(MAX),
-    FOREIGN KEY (childID) REFERENCES tblChildren(childID),
-    FOREIGN KEY (vaccineID) REFERENCES tblVaccines(vaccineID),
-    FOREIGN KEY (centerID) REFERENCES tblCenters(centerID),
-    FOREIGN KEY (appointmentID) REFERENCES tblAppointments(appointmentID)
-);
-GO
-
--- Tạo bảng tblChildVaccineNotes
-IF OBJECT_ID('tblChildVaccineNotes', 'U') IS NOT NULL
-    DROP TABLE tblChildVaccineNotes;
-GO
+--------------------------------------------------------------------------------
+-- 14) Tạo bảng tblChildVaccineNotes
+--------------------------------------------------------------------------------
 CREATE TABLE tblChildVaccineNotes (
     noteID INT PRIMARY KEY IDENTITY(1,1),
     vaccineID INT NOT NULL,
@@ -223,10 +192,11 @@ CREATE TABLE tblChildVaccineNotes (
 );
 GO
 
------------------------------------------------------
+-------------------------------------------------------------------------------
 -- INSERT DATA
------------------------------------------------------
--- tblCustomers
+-------------------------------------------------------------------------------
+
+-- 1) Dữ liệu cho tblCustomers
 INSERT INTO tblCustomers (userID, password, fullName, roleID, email, address, phone, status) 
 VALUES 
 ('admin', '2', 'Tran Gia Huy', 'AD', 'admin@example.com', '123 Main St', '0123456789', 1),
@@ -238,21 +208,21 @@ VALUES
 ('cus6', '1', 'Tran Thi B', 'US', 'tranthib@gmail.com', 'So 5 Le Loi, TP.HCM', '0987654321', 1);
 GO
 
--- tblCenters
+-- 2) Dữ liệu cho tblCenters
 INSERT INTO tblCenters (centerName, address, phoneNumber, email, operatingHours, description)
 VALUES	
 ('VNVC Ha Noi', 'So 180 Truong Chinh, Ha Noi', '0243-1234567', 'hanoi@vnvc.vn', '08:00 - 18:00', 'Trung tam tiem chung VNVC tai Ha Noi'),
 ('VNVC Ho Chi Minh', 'So 198 Nguyen Thi Minh Khai, Quan 1, TP.HCM', '0283-9876543', 'hcm@vnvc.vn', '08:00 - 18:00', 'Trung tam tiem chung VNVC tai TP.HCM');
 GO
 
--- tblChildren
+-- 3) Dữ liệu cho tblChildren
 INSERT INTO tblChildren (userID, childName, dateOfBirth, gender)
 VALUES
 ('admin', 'Nguyen Thi C', '2018-03-25', 'Female'),
 ('cus1', 'Tran Van D', '2019-08-10', 'Male');
 GO
 
--- tblVaccines
+-- 4) Dữ liệu cho tblVaccines
 INSERT INTO tblVaccines (vaccineName, description, price, recommendedAge, status)  
 VALUES  
 ('Vaccine bach hau', 'Phong ngua benh bach hau o tre em', 500000, '2 thang tuoi tro len', 'Active'),  
@@ -277,17 +247,7 @@ VALUES
 ('Vaccine phoi phuc hop', 'Phong cac benh viem phoi va benh lien quan', 2500000, '6 thang tuoi tro len', 'Active');
 GO
 
--- tblChildVaccineNotes
-IF OBJECT_ID('tblChildVaccineNotes', 'U') IS NOT NULL
-    DROP TABLE tblChildVaccineNotes;
-GO
-CREATE TABLE tblChildVaccineNotes (
-    noteID INT PRIMARY KEY IDENTITY(1,1),
-    vaccineID INT NOT NULL,
-    note NVARCHAR(MAX) NOT NULL,
-    FOREIGN KEY (vaccineID) REFERENCES tblVaccines(vaccineID)
-);
-GO
+-- 5) Dữ liệu cho tblChildVaccineNotes
 INSERT INTO tblChildVaccineNotes (vaccineID, note)
 VALUES
 (1, N'Nên tiêm lúc trẻ 2, 3, 4 tháng tuổi và nhắc lại lúc 18 tháng. Thường kết hợp với uốn ván, ho gà trong gói 5 trong 1.'),
@@ -312,34 +272,81 @@ VALUES
 (20, N'Phòng viêm phổi và các bệnh liên quan. Thường bắt đầu từ 6 tháng tuổi, tùy phác đồ.');
 GO
 
--- tblAppointments
+--------------------------------------------------------------------------------
+-- 6) Dữ liệu tblAppointments (quan trọng để hiển thị "X" hay "Tiêm Chủng")
+--    Tạo một số lịch hẹn cho childID=1 và childID=2, với ngày 2025 (trước hoặc sau hôm nay)
+--------------------------------------------------------------------------------
 INSERT INTO tblAppointments (childID, centerID, appointmentDate, serviceType, notificationStatus, status)
 VALUES
-(1, 1, '2025-02-15', 'Single injection (Tiêm lẻ)', 'Not pending', 'Pending'),
-(2, 2, '2025-03-01', 'All inclusive (Trọn gói)', 'Not pending', 'Pending')
+-- Cho childID=1
+(1, 1, '2025-02-15', 'Single Vaccination (Tiêm lẻ)', 'Not pending', 'Pending'),
+(1, 1, '2025-03-01', 'Full Package (Trọn Gói)', 'Not pending', 'Pending'),
+-- Cho childID=2
+(2, 2, '2025-03-10', 'Personalization (Cá nhân hóa)', 'Not pending', 'Confirmed'),
+-- Thêm 1 lịch trước ngày 2025-02-27 (để hiển thị "X")
+(1, 1, '2025-02-01', 'Single Vaccination (Tiêm lẻ)', 'Not pending', 'Done');
 GO
 
--- tblAppointmentDetails
-INSERT INTO tblAppointmentDetails (appointmentID, vaccineID, doseNumber)
-VALUES
-(1, 1, 1),
-(2, 2, 1);
-GO
-
--- tblAppointmentSessions (Dữ liệu mẫu cho bảng này đã được bổ sung)
-INSERT INTO tblAppointmentSessions (childID, centerID, appointmentDate, serviceType, vaccineID)
-VALUES
-(1, 1, '2025-02-15', 'Single injection (Tiêm lẻ)', 1),
-(2, 2, '2025-03-01', 'All inclusive (Trọn gói)', 2);
-GO
-
--- tblFeedback
+--------------------------------------------------------------------------------
+-- 7) Dữ liệu cho tblFeedback
+--------------------------------------------------------------------------------
 INSERT INTO tblFeedback (userID, centerID, feedbackText, rating, feedbackDate)
 VALUES
-('admin', 1, 'Dich vu tot, nhan vien nhiet tinh.', 5, '2025-01-05'),
-('cus1', 2, 'Trung tam sach se, an toan.', 4, '2025-01-06');
+('admin', 1, N'Dịch vụ tốt, nhân viên nhiệt tình.', 5, '2025-01-05'),
+('cus1', 2, N'Trung tâm sạch sẽ, an toàn.', 4, '2025-01-06');
 GO
 
+--------------------------------------------------------------------------------
+-- 8) Dữ liệu cho tblPackages
+--------------------------------------------------------------------------------
+INSERT INTO tblPackages (packageName, description, price, status)
+VALUES
+('Goi 5 trong 1', N'Bao gồm các mũi tiêm 5 trong 1', 2500000, 'Active'),
+('Goi phong cum', N'Bao gồm các mũi tiêm phòng cúm mùa', 1200000, 'Active');
+GO
+
+--------------------------------------------------------------------------------
+-- 9) Dữ liệu cho tblNotifications
+--------------------------------------------------------------------------------
+INSERT INTO tblNotifications (userID, notificationDate, notificationText, isRead)
+VALUES
+('admin', '2025-01-10', N'Lịch tiêm của bé Nguyễn Thị C vào ngày 2025-02-15 tại VNVC Hà Nội', 0),
+('cus1', '2025-01-12', N'Lịch tiêm của bé Trần Văn D vào ngày 2025-03-01 tại VNVC Hồ Chí Minh', 0),
+('cus1', '2025-01-15', N'Lịch tiêm của bé Trần Văn D vào ngày 2025-03-10 tại VNVC Hà Nội', 1);
+GO
+
+--------------------------------------------------------------------------------
+-- 10) Dữ liệu cho tblServices
+--------------------------------------------------------------------------------
+INSERT INTO tblServices (serviceName, description, price, status)
+VALUES
+('Tiem Vaccine', N'Dịch vụ tiêm lẻ các loại vaccine', 500000, 'Active'),
+('Tu Van', N'Tư vấn các loại vaccine và lịch tiêm', 200000, 'Active'),
+('Giam sat suc khoe', N'Dịch vụ kiểm tra và giám sát sức khỏe trước khi tiêm', 300000, 'Active');
+GO
+
+--------------------------------------------------------------------------------
+-- 11) Dữ liệu cho tblPackageDetails
+--------------------------------------------------------------------------------
+INSERT INTO tblPackageDetails (packageID, vaccineID)
+VALUES
+(1, 1),
+(2, 2);
+GO
+
+--------------------------------------------------------------------------------
+-- 12) Dữ liệu cho tblServiceAppointments
+--------------------------------------------------------------------------------
+INSERT INTO tblServiceAppointments (appointmentID, serviceID)
+VALUES
+(1, 1),
+(2, 2),
+(2, 3);
+GO
+
+----------------------------------------------------------------------------------
+-- 13) Dữ liệu cho tblReport
+----------------------------------------------------------------------------------
 -- tblReports
 INSERT INTO tblReports (centerID, reportDate, totalAppointments, totalRevenue)
 VALUES
@@ -357,48 +364,53 @@ VALUES
 (1, '2025-01-12', 21, 15750000);
 GO
 
--- tblPackages
-INSERT INTO tblPackages (packageName, description, price, status)
-VALUES
-('Goi 5 trong 1', 'Bao gom cac mui tiem 5 trong 1', 2500000, 'Active'),
-('Goi phong cum', 'Bao gom cac mui tiem phong cum mua', 1200000, 'Active');
+
+--------------------------------------------------------------------------------
+-- Script hoàn tất
+--------------------------------------------------------------------------------
+PRINT 'Done: Database ChildVaccine2 schema & sample data created successfully!';
 GO
 
--- tblNotifications
-INSERT INTO tblNotifications (userID, notificationDate, notificationText, isRead)
-VALUES
-('admin', '2025-01-10', 'Lich tiem cua be Nguyen Thi C vao ngay 2025-02-15 tai VNVC Ha Noi', 0),
-('cus1', '2025-01-12', 'Lich tiem cua be Tran Van D vao ngay 2025-03-01 tai VNVC Ho Chi Minh', 0),
-('cus1', '2025-01-15', 'Lich tiem cua be Tran Van D vao ngay 2025-03-10 tai VNVC Ha Noi', 1);
+----------------
+--Test
+----------------
+-- Tạo bảng lưu phản ứng sau tiêm
+
+DROP TABLE IF EXISTS tblVaccineReactions;
+CREATE TABLE tblVaccineReactions (
+    reactionID INT PRIMARY KEY IDENTITY(1,1),
+    appointmentID INT NOT NULL,
+    reactionText NVARCHAR(MAX) NULL,
+    reactionDate DATE NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (appointmentID) REFERENCES tblAppointments(appointmentID) ON DELETE CASCADE
+);
 GO
 
--- tblServices
-INSERT INTO tblServices (serviceName, description, price, status)
-VALUES
-('Tiem Vaccine', 'Dich vu tiem le cac loai vaccine', 500000, 'Active'),
-('Tu Van', 'Tu van cac loai vaccine va lich tiem', 200000, 'Active'),
-('Giam sat suc khoe', 'Dich vu kiem tra va giam sat suc khoe truoc khi tiem', 300000, 'Active');
+CREATE TABLE tblDoctor (
+    doctorID VARCHAR(50) PRIMARY KEY,
+    doctorName NVARCHAR(50) NOT NULL,
+    password VARCHAR(50) NOT NULL,
+    roleID VARCHAR(10) DEFAULT 'Doctor',
+    email VARCHAR(50),
+    address NVARCHAR(100),
+    phone VARCHAR(20),
+    status BIT DEFAULT 1
+);
+
+
+INSERT INTO tblDoctor (doctorID, password, doctorName, roleID, email, address, phone, status) 
+VALUES 
+('doc1', '2', 'Nguyen Cong Son', 'doctor', 'doc1@example.com', '123 NY St', '036945978', 1),
+('doc2', '2', 'Ly Thien Long', 'doctor', 'doc2@example.com', '456  NY Street', '046987123', 1),
+('doc3', '2', 'Ly Cao Cuong', 'doctor', 'doc3@example.com', '789 NY Street', '014632879', 1)
+
+ALTER TABLE tblAppointments
+ADD vaccineID INT;
 GO
 
--- tblPackageDetails
-INSERT INTO tblPackageDetails (packageID, vaccineID)
-VALUES
-(1, 1),
-(2, 2);
+ALTER TABLE tblAppointments
+ADD CONSTRAINT FK_tblAppointments_tblVaccines
+FOREIGN KEY (vaccineID) REFERENCES tblVaccines(vaccineID);
 GO
 
--- tblServiceAppointments
-INSERT INTO tblServiceAppointments (appointmentID, serviceID)
-VALUES
-(1, 1),
-(2, 2),
-(2, 3);
-GO
-
--- tblRecords
-INSERT INTO tblRecords (childID, vaccineID, doseNumber, vaccinationDate, centerID, appointmentID, notes)
-VALUES
-(1, 1, 1, '2025-02-15', 1, 1, 'Be Nguyen Thi C tiem mui 1 vaccine 5 trong 1'),
-(2, 2, 1, '2025-03-01', 2, 2, 'Be Tran Van D tiem mui 1 vaccine phong cum')
-GO
 
