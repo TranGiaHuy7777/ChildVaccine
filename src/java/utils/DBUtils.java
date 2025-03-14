@@ -17,7 +17,7 @@ public class DBUtils {
 
     private static final String DB_NAME = "ChildVaccine2";
     private static final String USER_NAME = "sa";
-    private static final String PASSWORD = "123";
+    private static final String PASSWORD = "AkoTamaki2002";
 
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
         Connection conn = null;
