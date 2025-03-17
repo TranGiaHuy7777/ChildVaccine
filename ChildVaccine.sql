@@ -1,0 +1,7 @@
+SELECT TOP (1000) [paymentID]
+      ,[appointmentID]
+      ,[amount]
+      ,[paymentDate]
+      ,[status]
+      ,[paymentMethod]
+  FROM [ChildVaccine].[dbo].[Payments]
